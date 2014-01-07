@@ -31,7 +31,7 @@ public class DictionaryTest extends TestCase
         return list;
     }
 
-    public void testContain()
+    public void testContainChinese()
     {
         AbstractDoubleArrayTrie trie = new DoubleArrayTrieImpl(MAX_CJK_UNICODE-MIN_CJK_UNICODE+1);
 
@@ -41,11 +41,6 @@ public class DictionaryTest extends TestCase
         SearchResult searchResult = trie.containsPrefix(word);
         Assert.assertEquals(SearchResult.PERFECT_MATCH,searchResult);
 
-
-        word = toIntegerList("川菜");
-        trie.addToTrie(word);
-        searchResult = trie.containsPrefix(word);
-        Assert.assertEquals(SearchResult.PERFECT_MATCH,searchResult);
 
         word = toIntegerList("川菜馆");
         trie.addToTrie(word);
@@ -57,6 +52,28 @@ public class DictionaryTest extends TestCase
         Assert.assertEquals(SearchResult.PURE_PREFIX,searchResult);
 
 
+
+    }
+
+    public void testAddWordWhosePrefixIsWord()
+    {
+        AbstractDoubleArrayTrie trie = new DoubleArrayTrieImpl(MAX_CJK_UNICODE-MIN_CJK_UNICODE+1);
+
+        //当有多个词语共享前缀时，先添加最长的词语，后添加前缀词语：
+        IntegerList word = toIntegerList("川菜馆");
+        trie.addToTrie(word);
+        SearchResult searchResult = trie.containsPrefix(word);
+        Assert.assertEquals(SearchResult.PERFECT_MATCH,searchResult);
+
+        word = toIntegerList("川菜");
+        searchResult = trie.containsPrefix(word);
+        Assert.assertEquals("词语前缀为词语",SearchResult.PURE_PREFIX,searchResult);
+
+        //后加入,应为 prefix:
+        word = toIntegerList("川菜");
+        trie.addToTrie(word);
+        searchResult = trie.containsPrefix(word);
+        Assert.assertEquals("词语前缀应能识别出来",SearchResult.PREFIX,searchResult);
 
     }
 }
